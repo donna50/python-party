@@ -1,0 +1,238 @@
+def load_asn1_data(filename='songdata.csv'):
+	"""
+	This function loads the file `songdata.csv` and returns a LIST of
+	of songs... and each element of the list is ANOTHER LIST (queue 'Inception' music)
+	that contains various information about that song (e.g. title, artist, tempo).
+	We'll talk about lists formally in class in a few lectures, but maybe
+	you can start guessing how they work based on what you see here...
+	"""
+
+	import csv
+
+	reader = csv.reader(open(filename, 'rU'))
+	songs = []
+
+	for r in reader:
+		songs.append(r)
+
+	return songs
+
+
+
+
+# It holds a for loop with an if statement containing variables that store the current fastest tempo and its year
+# At the end it returns fastest tempo and its year of the data set.
+def fastest_year(songs):
+
+    current_fastest_tempo = 0
+    current_fastest_year = 0
+
+	# This is an instruction to Python: Do the body (the indented code) following
+	# `for` statement, for _every_ song in our list of songs.
+	# This is a LOOP. It's already written for you... you just have to fill in the body
+
+    for song in songs[0:-2]:
+
+		# Here we're extracting the information from the song list and storing it
+		# in variables. It's not great form to create variables that you don't use,
+		# but since you'll probably use this as a template to solve other parts of the
+		# assignment, I'm going to extract _everything_ into variables for you.
+
+		title = song[0]
+		artist = song[1]
+		year = int(song[2])
+		tempo = float(song[3])
+		artist_hotness=float(song[4])
+		duration = float(song[5])
+		key = int(song[6])
+		loudness = float(song[7])
+		mode = int(song[8])
+
+		# If the tempo of the current song is _faster_ than the fastest tempo you've
+		# recorded so far... you should store this new, fastest tempo... AND... the
+		# year of the song.
+
+		if tempo > current_fastest_tempo:
+			current_fastest_tempo = tempo
+			current_fastest_year = year
+
+    return current_fastest_year
+
+# This loudest year function finds the loudest year with a for loop and an if statement which stores the current loudest song and its year in variables.
+# Loudness is measured in negative numbers and louder songs are higher if it scores closer to 0 (less negative)
+# At the end, it returns the name of the loudest song
+
+def loudest_song(songs):
+
+    current_loudest_data= -1000
+    current_loudest_songname= "songname"
+
+    for song in songs[0:-2]:
+
+		# Here we're extracting the information from the song list and storing it
+		# in variables. It's not great form to create variables that you don't use,
+		# but since you'll probably use this as a template to solve other parts of the
+		# assignment, I'm going to extract _everything_ into variables for you.
+
+		title = song[0]
+		artist = song[1]
+		year = int(song[2])
+		tempo = float(song[3])
+		artist_hotness=float(song[4])
+		duration = float(song[5])
+		key = int(song[6])
+		loudness = float(song[7])
+		mode = int(song[8])
+
+		# If the tempo of the current song is _faster_ than the fastest tempo you've
+		# recorded so far... you should store this new, fastest tempo... AND... the
+		# year of the song.
+
+		if loudness > current_loudest_data:
+			current_loudest_data = loudness
+			current_loudest_songname = title
+
+    return current_loudest_songname
+
+# This hottest artist function finds the artist with the highest artist hotness score with a for loop and an if statement which stores the the current hottest artist score and its artist in variables
+# The initial current_hottest_function begins at 0 because it is measured in positive numbers (the higher-the better)
+# In the end, the function returns the name of the hottest artist
+
+def hottest_artist(songs):
+
+    current_hottest_songdata = 0
+    current_hottest_songname = "songname"
+
+    for song in songs[0:-2]:
+
+		# Here we're extracting the information from the song list and storing it
+		# in variables. It's not great form to create variables that you don't use,
+		# but since you'll probably use this as a template to solve other parts of the
+		# assignment, I'm going to extract _everything_ into variables for you.
+
+		title = song[0]
+		artist = song[1]
+		year = int(song[2])
+		tempo = float(song[3])
+		artist_hotness=float(song[4])
+		duration = float(song[5])
+		key = int(song[6])
+		loudness = float(song[7])
+		mode = int(song[8])
+
+		# If the tempo of the current song is _faster_ than the fastest tempo you've
+		# recorded so far... you should store this new, fastest tempo... AND... the
+		# year of the song.
+
+		if artist_hotness > current_hottest_songdata:
+			current_hottest_songdata = artist_hotness
+			current_hottest_songname = artist
+
+    return current_hottest_songname
+
+# A function with a for loop and an if statment that stores the minimum year in current_year of the data set during the loop
+# The function returns the minimum year of the dataset
+
+def min(songs):
+
+    current_min_year = 0
+
+    for song in songs[0:-2]:
+
+		# Here we're extracting the information from the song list and storing it
+		# in variables. It's not great form to create variables that you don't use,
+		# but since you'll probably use this as a template to solve other parts of the
+		# assignment, I'm going to extract _everything_ into variables for you.
+
+		title = song[0]
+		artist = song[1]
+		year = int(song[2])
+		tempo = float(song[3])
+		artist_hotness=float(song[4])
+		duration = float(song[5])
+		key = int(song[6])
+		loudness = float(song[7])
+		mode = int(song[8])
+
+		# If the tempo of the current song is _faster_ than the fastest tempo you've
+		# recorded so far... you should store this new, fastest tempo... AND... the
+		# year of the song.
+
+		if year > current_min_year:
+			current_min_year = year
+    return current_min_year
+
+# A function using a for loop with an if statement that uses current_max_year as a variable to store the largest years during the loop
+# The function returns the largest year in the dataset
+
+def max(songs):
+
+    current_max_year = 2020
+
+    for song in songs[0:-2]:
+
+		# Here we're extracting the information from the song list and storing it
+		# in variables. It's not great form to create variables that you don't use,
+		# but since you'll probably use this as a template to solve other parts of the
+		# assignment, I'm going to extract _everything_ into variables for you.
+
+		title = song[0]
+		artist = song[1]
+		year = int(song[2])
+		tempo = float(song[3])
+		artist_hotness=float(song[4])
+		duration = float(song[5])
+		key = int(song[6])
+		loudness = float(song[7])
+		mode = int(song[8])
+
+		# If the tempo of the current song is _faster_ than the fastest tempo you've
+		# recorded so far... you should store this new, fastest tempo... AND... the
+		# year of the song.
+
+		if year < current_max_year:
+			current_max_year = year
+    return current_max_year
+
+#this function takes all the songs in one year and calculates the average loudness for that year
+def avg_loudness_by_year(songs):
+
+    pyear = range (2010-1926) # using min and max created a range of years where all the songs fall into
+    pyearnum = [0]*(2010-1926+1) # creating an array of 0 for number of songs
+    pyeartotal = [0]*(2010-1926+1) # creating an array of 0 for total loudness
+
+    for song in songs[0:-2]:
+
+        title = song[0]
+        artist = song[1]
+        year = int(song[2])
+        tempo = float(song[3])
+        artist_hotness=float(song[4])
+        duration = float(song[5])
+        key = int(song[6])
+        loudness = float(song[7])
+        mode = int(song[8])
+
+        index = year - 1926 # creates an index for each year to use below
+        pyeartotal[index] += loudness # uses index to add loudness to total loudness
+        pyearnum[index] +=1 # adds 1 to the total number of songs
+
+
+    for i in range(2010-1926+1): #for every year in the range, 1 is added so the end years are included
+        if pyearnum[i] != 0: # if year exists in the data and not a 0
+            pyearaverage = pyeartotal[i]/pyearnum[i] # takes the total loudness of year/# of songs
+            year = i + 1926  # using index to get the year of the average loudness
+            print year , pyearaverage #prints out year and the average loudness
+
+
+
+# Storing all the songs in the variable all_songs
+all_songs = load_asn1_data(filename='songdata.csv')
+
+#printing out all the previous functions with the data stored in all_songs for final result
+print fastest_year(all_songs) #1988
+print loudest_song(all_songs)#Molly's Reach Around
+print hottest_artist(all_songs)#Kanye West
+print max(all_songs) # printed to see values for bonus
+print min(all_songs) #printed to see vallues for bonus
+print avg_loudness_by_year(all_songs)
