@@ -1,0 +1,240 @@
+
+def comb_sort(list,shrink):
+	"""
+	This function take an unsorted list and sorts it. 
+
+	:param list: a 1D list you want to sort 
+	:param shrink: the factor you want to divide the gap length after each iteration 
+	
+	:return: a sorted list 
+	
+	"""
+	gap = len(list) 
+	while gap > 1: # while the gap is greater than one and therefore not bubble sort 
+		gap = int(gap/shrink) #shrink the gap 
+		i = 0 # pointer to know where you are in the list 
+		while i + gap < len(list): #makes sure the gap doesn't become too big for the list 
+			if list[i] > list[i + gap]:
+				tmp = list[i] #temporary variable to hold the value of the first element
+				list[i] = list [i + gap] #swapping the two elements in the list 
+				list[i + gap] = tmp  
+			i = i + 1 #increment the pointer to move onto the next element in the list 
+	return list 
+
+
+#---LOAD DATA---
+
+def load_asn1_data(filename='haberman.data.csv'):
+	"""
+	This function loads the file 'haberman.data.csv' 
+	
+	param filename: filename has the file CVC_data.csv stored into it 
+	
+	return: a list of patients and each row contains [Age of at the time of operation, year of surgey 19--,number of positive auxillary nodes detected, survival status] 
+	
+	"""
+	import csv
+
+	reader = csv.reader(open(filename, 'rU')) #reads the file
+	
+	master_list = [] #intialize an empty list 
+
+	for r in reader:
+		master_list.append(r) #adds each row to the list 
+	
+	return master_list
+	
+	
+
+
+import numpy 
+def dat2arr(datalist):
+	"""
+	This function takes a list of lists and turns it into a numpy array.
+	
+	:param datalist: a list of lists 
+	
+	:return: a 2-D array 
+	
+	"""
+	x = numpy.array(datalist) # creating a numpy array  
+	x = x.astype(numpy.float32) # Changed array data type from strings to float 32 to be able to do manipulate the data 
+	return x 
+
+	
+
+
+#---VISUALIZATIONS ---
+
+import matplotlib.pyplot as plt 
+
+#---HISTOGRAMS---
+def plot4(data):
+	"""
+	This function plots 4 histrograms in the same plot, with each histogram representing one column in a 2D array.This function only works when there are 4 columns. 
+
+	:param data: 2D array 
+	
+	"""
+
+	samples1 = data[:,0]
+	samples2 = data[:,1]
+	samples3 = data[:,2]
+	samples4 = data[:,3] 
+	
+	#---top left ---
+	plt.subplot( 2, 2, 1 ) #position of the histogram in the subplot, 
+	n1, bins1, patches1  = plt.hist( samples1, len(samples1), facecolor="m",  #plotting the histogram with the first column 
+                                  range=[1,len(samples1)], normed=False )
+	plt.xlabel( 'Age at Operation' ) #xaxis label 
+	plt.ylabel( 'Count' ) #yaxis label 
+	plt.title( "Ages at the Time of Operation") #title 
+    
+    #--- top right ---
+	plt.subplot( 2, 2, 2 )
+	n2, bins2, patches2  = plt.hist( samples2, len(samples2), facecolor="y", 
+                                  range=[1,len(samples2)], normed=False )
+	plt.xlabel( 'Year(19__)' )
+	plt.ylabel( 'Count' )
+	plt.title( "Patient's Year of Operations")
+
+    #--- bottom left ---
+	plt.subplot( 2, 2, 3 )
+	n3, bins3, patches3  = plt.hist( samples3, len(samples3), facecolor="grey", 
+                                  range=[1,len(samples3)], normed=False )
+	plt.xlabel( 'Number of Positive Axillary Nodes Detected' )
+	plt.ylabel( 'Count' )
+	plt.title("Frequency of Number of Positive Axillary Nodes Detected")
+	
+    #--- bottom right ---
+	plt.subplot( 2, 2, 4 )
+	n4, bins4, patches4  = plt.hist( samples4, len(samples4), facecolor="r", 
+                                  range=[1,len(samples4)], normed=False )
+	plt.title( "Survival Status after Five Years")
+	plt.xlabel( 'Survival Status' )
+	plt.ylabel( 'Count' )
+	
+	plt.show() # show the histograms plotted and click on adjust configure subplots if overlapping when the graph appears 
+
+def hist_compare(arr,col):
+	"""
+	This function will plot two histograms. One histogram will plot the data in col for survived class and one histogram
+	will plot the data in col for dead class 
+	
+	:param arr: a 2-D array 
+	:param col: 1 column you want to plot for survived vs. dead class 
+	
+	"""
+	died	= []
+	survived = []
+	for n in range (0,len(arr)):
+		if arr[n][3] == 1.0:
+			survived.append(arr[n][col]) # also n is the row number - adds to the vampire data list which column data you selected for 
+		if arr[n][3] == 2.0:
+			died.append(arr[n][col])
+	import numpy as np
+	import matplotlib.pyplot as plt
+	plt.hist(survived)  # plotting a histogram 
+	plt.show() #to show the histogram 
+	plt.hist(died)
+	plt.show()
+
+
+#---STEM PLOTS--- 
+
+def stem_plots(data,col,col1,xlabel,ylabel,title):
+	"""
+	This plots a stem plot for one column in a 2-D array. 
+
+	:param data: 2D array 
+	:param col: which column you want to plot on xaxis 
+	:parm col1:  which column you want to plot on yaxis 
+	:parm xlabel: x axis label (i.e "age" - use quotation marks for input) 
+	:parm ylabel: y axis label(use quotation marks for input) 
+	:title: title of the stem plot (use quotation marks for input) 
+	
+	"""
+
+	plt.stem(data[:,col],data[:,col1],'-dg') #plots the stem plot for two columns
+	plt.xlabel(xlabel) #labels the x axis
+	plt.ylabel(ylabel) #labels the y axis
+	plt.title(title) #labels the title
+	plt.show() # shows the graph 
+
+
+
+
+#---MACHINE LEARNING 1--- 
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import cross_validation
+	
+def k_neighbours(array,neighbours,test):
+	"""
+	This function will perform a k neighbours supervised learning algorithm with cross validation on a 2D array and return an accuracy for the predictions. 
+	
+	:param array: a 2-D array 
+	:param neighbours: the number of neighbours you want the algorithm to pick during prediction 
+	:parm test: how much of your data you want for the test set (i.e 15% then test = 0.15) 
+	
+	:return: the accuracy in percent of the predicitions vs real data 
+	
+	"""
+	labels = array[:,3] # what you are trying to predict
+	data = array[:,:3] #data that the program uses to learn how to predict 
+	knn = KNeighborsClassifier(algorithm='auto', leaf_size=1, metric='minkowski', n_neighbors=neighbours, p=2, weights='uniform',random=5) # the classifer 
+	cv = cross_validation.ShuffleSplit(len(data),n_iter=10,test_size=test,random_state=0) #shuffle split cross validation of the data 
+	knn_score = cross_validation.cross_val_score(knn,data,labels, cv=cv) # performing the predicitons and classify how accurate the method was  
+	return numpy.mean(knn_score) #note it returns the same score if you run the program again right after with same conditions - reopen the shell for new test or change conditions
+
+#---MACHINE LEARNING 2---
+from sklearn import svm
+from sklearn import cross_validation
+def support_vector_model(array,test):
+	"""
+	This function will perform a support vector supervised learning algorithm with cross validation on a 2D array and return an accuracy for the predictions. 
+	
+	:param array: a 2-D array 
+	:parm test: how much of your data you want for the test set (i.e 15% then test = 0.15) 
+	
+	:return: the accuracy in percent of the predicitions vs real data 
+	
+	"""
+	labels = array[:,3] # what you are trying to predict
+	data = array[:,:3] #data used to make the prediction
+	svc = svm.SVC(kernel='linear') # classifier, but kernal can be changed to rbf, or polynomial dependent on dataset 
+	cv = cross_validation.ShuffleSplit(len(array),n_iter=10,test_size=test,random_state=0) #cross validation shuffle split 
+	svc_score = cross_validation.cross_val_score(svc,data,labels, cv=cv) # performing the predicitons and classify how accurate the method was 
+	return numpy.mean(svc_score) 
+
+master_data = load_asn1_data(filename='haberman.data.csv')	 # loading data into a variable 
+master_array = dat2arr(master_data) #loading the array into a variable 
+
+intlist.sort() # sorts a list 
+
+binary_search([1,5,4,9,7,19,15,17],4,0,8)
+def binary_search(inlist,val,left,right):
+	while left <= right:
+		midpoint = (left+right)/2 
+		print midpoint, right, left 
+		if inlist[midpoint] > val:
+			right = midpoint - 1
+		elif inlist[midpoint] < val:
+			left =  midpoint + 1
+		else:
+			return midpoint
+	return -1
+	
+def insertion_sort(inlist):
+	sorted_list = []
+	for element in inlist: # n number of elements 
+		i = 0
+		while i < len(sorted_list) and (element > sorted_list[i]):
+			i = i + 1
+			print i 
+		sorted_list.insert(i,element)
+	return sorted_list
+# best case for while is 2(n-1) because test it once worst cause is the reverse so n**2
+	
+b = [2,8,1,7,9,4,37] 
+
+	
