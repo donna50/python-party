@@ -1,0 +1,170 @@
+def load_asn3_data(filename='CVC_data.csv'):
+	"""
+	This function loads the file 'CVC_data.csv' and returns a list of patients with their own lists. 
+	
+	:param filename: filename has the file CVC_data.csv stored into it 
+	
+	:return: a list of subjects and each subject contains a list with the parameters name, height(cm), weight(kg), 
+	stake aversion, garlic aversion, reflectance, shiny, IS_VAMPIRE?.
+	
+	"""
+	import csv
+
+	reader = csv.reader(open(filename, 'rU')) #reads the file 
+	master_list = [] #initialize empty list 
+
+	for r in reader:
+		master_list.append(r)  #adds each row to the the list 
+
+	return master_list
+
+import numpy 
+import matplotlib.pyplot as plt 
+
+def dat2arr(datalist):
+	"""
+	This function takes a list of lists and turns it into a numpy array, and slices off the subject name.  
+	Each new line of the returned array is height(cm), weight(kg), stake aversion, garlic aversion, reflectance, 
+	shiny, IS_VAMPIRE? for one subject. 
+	
+	:param datalist: a list of lists 
+	
+	:return: a 2-D array without the first column 
+	
+	"""
+	x = numpy.array(datalist)[:,1:] # creating a numpy array and slicing off the first column 
+	x = x.astype(numpy.float32) # Changed array data type from strings to float 32 to be able to do calculations 
+	return x 
+		
+def save_array(arr,fname):
+	"""
+	This function will save a 2-D array into a matlab file named fname. The matlab array is named 
+	vampire array. 
+
+	:param arr: a 2-D array 
+	:param fname: name you want to save the new matlab file under 
+	
+	"""
+	mydict ={} #empty dictionary 
+	mydict['vampire_array'] = arr #creating a key for the arr to be stored in a matlab file 
+	import scipy.io
+	scipy.io.savemat(fname,mydict)
+
+def column_stats(arr,col):
+	"""
+	The function iterates over every row in the array and adds data from a specific column to one of two lists (for vampires
+	or non-vampire data) based on if the subject in that row is a vampire. Then summary statistics are calculated for the 
+	2 separate lists. 
+	
+	:param arr: a 2-D array 
+	:param col: a column in arr  
+	
+	:return: One list of summary statistics for vampires and one list of summary statistic for non-vampires based on one column 
+			
+	"""
+	vampire_data = [] #initializing an empty list 
+	non_vamp_data = []
+	full_vamp_stats = []
+	full_non_vamp_stats = []
+	for n in range (0,len(arr)): # iterate over all the rows so n is represents row number 
+		if arr[n][6] == 1.0: # if subject is a vampire  
+			vampire_data.append(arr[n][col]) # adds column data you selected for to the vampire data list 
+		if arr[n][6] == 0.0:  
+			non_vamp_data.append(arr[n][col]) 
+			
+	numpy.array(vampire_data) # making the list into an array to be able to calculate summary statistics 
+	numpy.array(non_vamp_data)
+	full_vamp_stats.append(min(vampire_data)) #calculating and adding a summary statistic to a new list 
+	full_vamp_stats.append(max(vampire_data))
+	full_vamp_stats.append(numpy.mean(vampire_data))
+	full_non_vamp_stats.append(min(non_vamp_data))
+	full_non_vamp_stats.append(max(non_vamp_data))
+	full_non_vamp_stats.append(numpy.mean(non_vamp_data))
+	return full_vamp_stats 
+	return full_non_vamp_stats
+	
+def hist_compare(arr,col):
+	"""
+	This function will plot two histograms. One histogram will plot the data in col for vampires and one histogram
+	will plot the data in col for non_vampires. 
+	
+	:param arr: a 2-D array 
+	:param col: 1 column you want to plot for vampires and non-vampires 
+	
+	"""
+	vampire_data = [] #initializing an empty list 
+	non_vamp_data = []
+	for n in range (0,len(arr)): # iterate over all the rows 
+		if arr[n][6] == 1.0:
+			vampire_data.append(arr[n][col]) # adds column data you selected for to the vampire data list 
+		if arr[n][6] == 0.0:
+			non_vamp_data.append(arr[n][col])
+	plt.hist(vampire_data)  # plotting a histogram 
+	plt.show() #to show the histogram 
+	plt.hist(non_vamp_data)
+	plt.show()
+
+def corr_columns(arr,col1,col2): 
+	"""
+	This function takes two columns in a 2-D array and calculates the Pearson Correlation between them.
+	
+	:parm arr: a 2-D array 
+	:parm col1: 1 column from arr 
+	:parm col2: 1 column from arr
+	
+	:return: the Pearson Correlation for col1 and col2 
+	
+	"""
+	import scipy.stats 
+	pearson_correlation = scipy.stats.pearsonr(arr[:,col1],arr[:,col2])[0] # calculates the only the pearson correlation and excludes the p-value
+	print pearson_correlation 
+	
+
+def scatter_columns(arr,col1,col2):
+	"""
+	This function will plot col1 and col2 from the array against each other on a scatter plot.
+	
+	:param arr: a 2-D array 
+	:param col: 1 column from arr 
+	:parm col2: 1 column from arr 
+	
+	"""
+
+	plt.scatter(arr[:,col1],arr[:,col2]) #plots a scatter plot for the two of the columns selected 
+	plt.show()
+		
+def is_vampire(row):
+	"""
+	When given one row of data from a subject, this function determines the probability if they are a vampire 
+	
+	:param row: 1-D array of 6 measurements of a subject 
+	 
+	:return: a probability if the subject is a vampire 
+	
+	"""
+	return numpy.clip(((row[2])**8 + 1.2*(1-row[4])**2 + .01*(1-row[3])),0.01,0.99) #using measurements to calculate probability 
+
+		
+def log_likelihood(arr,vampire_function): 
+	"""
+	This function runs a function on each row of the dataset and takes the log of the probability the subject is a vampire.
+	It adds this to a list which will in the end return a likelihood of the model. 
+	
+	:param arr: 2-D array with measurements of subjects
+	:parm vampire_function: a function that determines the probability the subject is a vampire 
+	
+	:return: the log likelihood of the model 
+	
+	"""
+
+	log_likelihood_result = 0 
+	for row in arr: # iterate over all rows 
+		result = vampire_function(row) # vampire_function calculates probability a subject is a vampire and stores it in a variable 
+		if row[6] > 0.5: # if a subject is a vampire 
+			log_likelihood_result = log_likelihood_result + numpy.log(result) # adds the probability the person is a vampire to the list
+		else:
+			log_likelihood_result = log_likelihood_result + numpy.log(1-result) # The complement (1-result) is used here because we want the probability that they are NOT a vampire 
+	return log_likelihood_result 
+ 
+master_data = load_asn3_data(filename='CVC_data.csv') #loading data into a variable
+final_array = dat2arr(master_data)  #storing the final array into a variable to be used in other functions 
